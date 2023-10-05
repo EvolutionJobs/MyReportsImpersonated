@@ -1,0 +1,74 @@
+﻿
+follow all steps to set up kerberos as normal and also the special steps to setup a website to work with it
+--- > useAppPoolCredentials must be set to true!!!!!!
+
+		' ------------- IMPORTANT ----------------------
+		' ------------- IMPORTANT ----------------------
+		' ------------- IMPORTANT ----------------------
+		' ------------- IMPORTANT ----------------------
+		' ------------- IMPORTANT ----------------------
+		' ------------- IMPORTANT ----------------------
+		' IF THE WEBSITE KEEP PROMPTING YOU FOR WINDOWS CREDENTIALS, THEN:
+		'Authentication > Enable Windows Authentication, then Right-Click to set the Providers.
+		' ----->>>>NEGOTIATE needs to be FIRST!
+		' ------SET: <identity impersonate="true" />
+
+		' ############### useAppPoolCredentials ########################
+		' ############### useAppPoolCredentials ########################
+		' ############### useAppPoolCredentials ########################
+		' ############### useAppPoolCredentials ########################
+		' ############### useAppPoolCredentials ########################
+		' ############### useAppPoolCredentials ########################
+		' ASLO must set :
+		' In the dropdown menu select system.webServer > security > authentication > windowsAuthentication > 
+		' Change useAppPoolCredentials to True as in:
+		' http://woshub.com/configuring-kerberos-authentication-on-iis-website/
+		' ############### useAppPoolCredentials ########################
+		' ############### useAppPoolCredentials ########################
+		' ############### useAppPoolCredentials ########################
+		' ############### useAppPoolCredentials ########################
+		' ############### useAppPoolCredentials ########################
+		' ############### useAppPoolCredentials ########################
+		' ############### useAppPoolCredentials ########################
+
+
+		SSRS kerberos for IIS website
+http://woshub.com/configuring-kerberos-authentication-on-iis-website/
+
+
+
+
+Watch:
+https://www.youtube.com/watch?v=vUcRoMrzzIA
+
+
+
+
+
+https://blogs.technet.microsoft.com/rob/2011/11/22/enabling-kerberos-authentication-for-reporting-services/
+
+
+https://docs.microsoft.com/en-us/sql/reporting-services/security/configure-windows-authentication-on-the-report-server?view=sql-server-2017
+
+
+word doc:
+Manage Kerberos Authentication Issues in a Reporting Services Environment 
+http://download.microsoft.com/download/B/E/1/BE1AABB3-6ED8-4C3C-AF91-448AB733B1AF/SSRSKerberos.docx
+look t the report server urls entererd
+
+
+
+
+1.	Can you check what is the error you get in the CRM report server? 
+1.	Report server error is located under: C:\Program Files\Microsoft SQL Server\[YOUR_INSTANCE]\Reporting Services\LogFiles
+2.	Regarding kerberos logging: 
+1.	http://support.microsoft.com/kb/262177
+2.	you want to look at the event viewer tool > system log
+
+
+
+
+
+
+
+

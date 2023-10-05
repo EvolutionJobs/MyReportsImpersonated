@@ -1,0 +1,502 @@
+﻿Imports System.Data
+
+Partial Class _MyAccount
+    Inherits System.Web.UI.Page
+
+    Protected Sub Page_Load(sender As Object, e As System.EventArgs) Handles Me.Load
+        '     <add name="BIWindowsConnectionString" connectionString="Initial Catalog=BI;Data Source=10.11.24.21;Integrated Security=SSPI;application name=WHUA"/>
+
+        'Initial catalog=BI;data source=10.11.24.21;Integrated Security=SSPI;persist security info=True;
+        'Initial Catalog=BI;Data Source=10.11.24.21;Integrated Security=SSPI;Persist security info=True;application name=WHUA
+
+        lblWindowsUsername.Text = HttpContext.Current.User.Identity.Name
+
+        'BIWindowsConnectionString = ConfigurationManager.ConnectionStrings("EDConnectionString").ConnectionString
+        BIWindowsConnectionString = ConfigurationManager.ConnectionStrings("BIWindowsConnectionString").ConnectionString
+
+
+        Dim sPanel As String = ""
+        pnlContactHR.Visible = False
+        'in query:  ?p=ha
+        pnlHaveDetails.Visible = False
+        'in query:  ?p=ed
+        pnlEditDetails.Visible = False
+
+        lnkcmdVerifyMobile.Visible = False
+        lnkcmdVerifyEmail.Visible = False
+        lnkcmdSendPasswordEmail.Visible = False
+        lnkcmdSendPasswordMobile.Visible = False
+
+        'If Request("p") <> "" Then
+        '    If Request("p") = "ha" Then
+        '        sPanel = "ha"
+
+        '    ElseIf Request("t") = "ed" Then
+        '        sPanel = "ed"
+
+        '    Else
+        '        'default = HR
+        '    End If
+
+        'Else
+        '    'default = HR
+
+        'End If
+
+        'If sPanel = "ha" Then
+        '    pnlHaveDetails.Visible = True
+        '    lblHeading.Text = "Manage Contact Details"
+        'ElseIf sPanel = "ed" Then
+        '    pnlEditDetails.Visible = True
+        '    lblHeading.Text = "Edit Contact Details"
+        'Else
+        '    pnlContactHR.Visible = True
+        '    lblHeading.Text = "Please Contact HR"
+        'End If
+
+        Dim bForgotPassword As Boolean = False
+        Dim bNewPassword As Boolean = False
+        Dim bManageAccount As Boolean = False
+        Try
+            If Session("action") = "RequestNewPassword" Then
+                lblHeading.Text = "Request New Password"
+                lblDetailsIntro.Text = "Please click one of the 'Send Password' buttons below to send a temporary password to your phone or email"
+                bNewPassword = True
+
+            ElseIf Session("action") = "FogottenPassword" Then
+                lblHeading.Text = "Forgotten Password"
+                lblDetailsIntro.Text = "Please click one of the 'Send Password' buttons below to send a temporary password to your phone or email"
+                bForgotPassword = True
+
+            ElseIf Session("action") = "ManageMyxxxAccount" Then xxxx
+                lblHeading.Text = "Manage My Details"
+                lblDetailsIntro.Text = "The following details will be used to send a temporary password to your phone or personal email if you forget your password. Please ensure the details below are accurate and up-to-date."
+                bManageAccount = True
+            End If
+        Catch ex As Exception
+        End Try
+
+
+
+        ' get the phone/email and then display HR or haveDetails panels accodingly
+        Dim sGetError As String = ""
+        Dim sDBPhone As String = ""
+        Dim sDBEmail As String = ""
+
+        ' 1. check if the phone/email has changed
+        ' 2. update the email/phone
+        ' 3. verify is either has changed
+        Using lib1 As New clsDB(BIWindowsConnectionString)
+            ' 1. get Stored info for comparison
+            sGetError = lib1.GetPhoneOrEmail(lblWindowsUsername.Text, sDBPhone, sDBEmail)
+            lblMobile.Text = sDBPhone
+            lblEmail.Text = sDBEmail
+        End Using
+
+        If sGetError.Trim <> "" Then
+            lblStatus.Text = sGetError
+            pnlContactHR.Visible = True
+            pnlHaveDetails.Visible = False
+            pnlEditDetails.Visible = False
+        Else
+
+            If sDBPhone.Trim <> "" Or sDBEmail.Trim <> "" Then
+
+                Dim outPhoneCode As String = ""
+                Dim outEmailCode As String = ""
+                Using lib1 As New clsDB(BIWindowsConnectionString)
+                    ' 1. get Stored info for comparison
+                    sGetError = lib1.GetVerificationCodes(lblWindowsUsername.Text, outPhoneCode, outEmailCode)
+                End Using
+
+                If sDBPhone.Trim <> "" Then
+                    ' there is a saved phone
+                    If outPhoneCode.Trim <> "" Then
+                        lnkcmdVerifyMobile.Visible = True
+
+                    Else
+                        If bForgotPassword Then
+
+                            lnkcmdSendPasswordMobile.Visible = True
+                        ElseIf bNewPassword Then
+
+                            lnkcmdSendPasswordMobile.Visible = True
+                        ElseIf bManageAccount Then
+
+                        End If
+
+                    End If
+                End If
+
+                If sDBEmail.Trim <> "" Then
+                    ' there is a saved email
+                    If sDBEmail.Trim <> "" Then
+                        lnkcmdVerifyEmail.Visible = True
+
+                    Else
+                        If bForgotPassword Then
+                            lnkcmdSendPasswordEmail.Visible = True
+
+                        ElseIf bNewPassword Then
+                            lnkcmdSendPasswordEmail.Visible = True
+
+                        ElseIf bManageAccount Then
+
+                        End If
+
+                    End If
+                End If
+
+                pnlContactHR.Visible = False
+                pnlHaveDetails.Visible = True
+                pnlEditDetails.Visible = False
+
+            Else
+                ' no details
+                pnlContactHR.Visible = True
+                pnlHaveDetails.Visible = False
+                pnlEditDetails.Visible = False
+
+            End If
+
+
+
+
+        End If
+
+
+
+        If Me.IsPostBack = False Then
+
+
+
+
+
+        End If
+
+    End Sub
+
+
+
+
+
+    Protected Sub lnkcmdRefresh_Click(sender As Object, e As EventArgs) Handles lnkcmdRefresh.Click
+
+        Response.Redirect(Request.Url.ToString)
+
+    End Sub
+
+
+
+    Protected Sub cmdEditContactDetails_Click(sender As Object, e As EventArgs) Handles cmdEditContactDetails.Click
+        pnlContactHR.Visible = False
+        pnlHaveDetails.Visible = False
+        pnlEditDetails.Visible = True
+    End Sub
+
+
+
+
+    Protected Function UpdatePhoneOrEmail(
+        ByVal PhoneEntered As String,
+        ByVal EmailEntered As String
+        ) As String
+
+        Dim sReturn As String = ""
+
+        ' save the details and if they have chnaged, then go to the verify page
+        Dim sGetError As String = ""
+
+        Dim sDBPhone As String = ""
+        Dim sDBEmail As String = ""
+
+        ' 1. check if the phone/email has changed
+        ' 2. update the email/phone
+        ' 3. verify is either has changed
+        Using lib1 As New clsDB(BIWindowsConnectionString)
+            ' 1. get Stored info for comparison
+            sGetError = lib1.GetPhoneOrEmail(lblWindowsUsername.Text, sDBPhone, sDBEmail)
+        End Using
+
+        If sGetError.Trim <> "" Then
+            sReturn = sGetError
+        Else
+
+            ' now compare mobile and email
+            If PhoneEntered.Trim <> "" Then
+                If sDBPhone.Trim <> "" Then
+                    If sDBPhone.Trim.Replace(" ", "") <> PhoneEntered.Trim.Replace(" ", "") Then
+                        ' entered phone is different from stored phone
+                        ' save it and then redirect to verify page
+
+                        ' 1. SAVE it without spaces and with a +
+                        ' 2. get verification code
+                        ' 3. Send SMS and 
+                        ' 4. redirect to code entry page
+
+                        ' 1. SAVE
+                        Using lib1 As New clsDB(BIWindowsConnectionString)
+                            ' 1. get Stored info for comparison
+                            sGetError = lib1.SaveUserPhone(lblWindowsUsername.Text, PhoneEntered.Trim.Replace(" ", ""))
+                        End Using
+
+                        If sGetError.Trim <> "" Then
+                            sReturn = sGetError
+                        Else
+
+                            ' 2. get verification code and send
+
+                            SendVerificationSMS(PhoneEntered.Trim.Replace(" ", ""))
+
+                        End If
+
+
+                    Else
+                        ' not changed
+                        sReturn = "Mobile number already saved"
+                    End If
+
+                End If
+            End If
+
+            If EmailEntered.Trim <> "" Then
+                If sDBEmail.Trim <> "" Then
+                    If sDBEmail.Trim.Replace(" ", "") <> EmailEntered.Trim Then
+                        ' entered phone is different from stored phone
+                        ' save it and then redirect to verify page
+
+                        ' 1. SAVE it without spaces and with a +
+                        ' 2. get verification code
+                        ' 3. Send emil and 
+                        ' 4. redirect to code entry page
+
+                        ' 1. SAVE
+                        Using lib1 As New clsDB(BIWindowsConnectionString)
+                            ' 1. get Stored info for comparison
+                            sGetError = lib1.SaveUserEmail(lblWindowsUsername.Text, EmailEntered.Trim)
+                        End Using
+
+                        If sGetError.Trim <> "" Then
+                            sReturn = sGetError
+                        Else
+
+                            ' 2. get verification code and send
+
+                            SendVerificationEmail(EmailEntered.Trim)
+
+                        End If
+
+                    Else
+                        ' not changed
+                        sReturn = "Mobile saved successfully"
+                    End If
+
+                End If
+            End If
+
+
+        End If
+
+        Return sReturn
+    End Function
+
+
+
+    Protected Function SendVerificationSMS(ByVal PhoneEntered As String) As String
+        Dim sReturn As String = ""
+        Dim sGetError As String = ""
+        Dim outPhoneCode As String = ""
+        Dim outEmailCode As String = ""
+        Using lib1 As New clsDB(BIWindowsConnectionString)
+            ' 1. get Stored info for comparison
+            sGetError = lib1.GetVerificationCodes(lblWindowsUsername.Text, outPhoneCode, outEmailCode)
+        End Using
+
+        If sGetError.Trim <> "" Then
+            sReturn = sGetError.Trim
+        Else
+
+            ' 3. Send SMS 
+            ' IMPORTANT : THE SMS ONLY WORKS ON A SERVER BECAUSE IT HAS TO HAVE RIGHTS TO RELAY TO EXTERNAL DOMAIN
+            ' IMPORTANT : THE SMS ONLY WORKS ON A SERVER BECAUSE IT HAS TO HAVE RIGHTS TO RELAY TO EXTERNAL DOMAIN
+            ' IMPORTANT : THE SMS ONLY WORKS ON A SERVER BECAUSE IT HAS TO HAVE RIGHTS TO RELAY TO EXTERNAL DOMAIN
+            ' IMPORTANT : THE SMS ONLY WORKS ON A SERVER BECAUSE IT HAS TO HAVE RIGHTS TO RELAY TO EXTERNAL DOMAIN
+            ' IMPORTANT : THE SMS ONLY WORKS ON A SERVER BECAUSE IT HAS TO HAVE RIGHTS TO RELAY TO EXTERNAL DOMAIN
+            Dim sSMSMessage As String = String.Format(sSMSVerificationMessage, outPhoneCode)
+            Dim sSMSError As String = SendSMS(PhoneEntered.Trim.Replace(" ", "").Replace("+", "00") & "@evotext.net", sSMSMessage)
+
+
+            ' 4. redirect to code entry page
+            If sSMSError.Trim <> "" Then
+                sReturn = sSMSError.Trim
+            Else
+                Response.Redirect("Verify.aspx?t=p")
+            End If
+
+        End If
+
+        Return sReturn
+    End Function
+
+
+    Protected Function SendVerificationEmail(ByVal EmailEntered As String) As String
+        Dim sReturn As String = ""
+        Dim sGetError As String = ""
+        Dim outPhoneCode As String = ""
+        Dim outEmailCode As String = ""
+        Using lib1 As New clsDB(BIWindowsConnectionString)
+            ' 1. get Stored info for comparison
+            sGetError = lib1.GetVerificationCodes(lblWindowsUsername.Text, outPhoneCode, outEmailCode)
+        End Using
+
+        If sGetError.Trim <> "" Then
+            sReturn = sGetError.Trim
+        Else
+            ' 3. Send email 
+            Dim sSMSMessage As String = String.Format(sEmailVerificationMessage, outEmailCode)
+            ' sendng SMS is same as sending email!!!
+            Dim sSMSError As String = SendSMS(EmailEntered.Trim, sSMSMessage)
+
+
+            ' 4. redirect to code entry page
+            If sSMSError.Trim <> "" Then
+                sReturn = sSMSError.Trim
+            Else
+                Response.Redirect("Verify.aspx?t=e")
+            End If
+        End If
+
+        Return sReturn
+
+    End Function
+
+
+    Protected Sub cmdUpdatePhone_Click(sender As Object, e As EventArgs) Handles cmdUpdatePhone.Click
+        lblStatus.Text = UpdatePhoneOrEmail(txtEditPhone.Text, "")
+
+        If lblStatus.Text.Trim.Contains("Error") Then
+            pnlContactHR.Visible = False
+            pnlHaveDetails.Visible = False
+            pnlEditDetails.Visible = True
+        Else
+            pnlContactHR.Visible = False
+            pnlHaveDetails.Visible = True
+            pnlEditDetails.Visible = False
+        End If
+
+    End Sub
+
+    Protected Sub cmdUpdateEmail_Click(sender As Object, e As EventArgs) Handles cmdUpdateEmail.Click
+
+        If IsValidEmail(txtEditEmail.Text.Trim) = False Then
+            lblStatus.Text = "Please enter a valid email address"
+        Else
+            lblStatus.Text = UpdatePhoneOrEmail(txtEditEmail.Text.Trim, "")
+
+            If lblStatus.Text.Trim.Contains("Error") Then
+                pnlContactHR.Visible = False
+                pnlHaveDetails.Visible = False
+                pnlEditDetails.Visible = True
+            Else
+                pnlContactHR.Visible = False
+                pnlHaveDetails.Visible = True
+                pnlEditDetails.Visible = False
+            End If
+        End If
+
+
+    End Sub
+
+
+    Protected Sub lnkcmdVerifyMobile_Click(sender As Object, e As EventArgs) Handles lnkcmdVerifyMobile.Click
+        ' go to the relevant verify page
+        lblStatus.Text = SendVerificationSMS(lblMobile.Text.Trim)
+    End Sub
+
+
+    Protected Sub lnkcmdVerifyEmail_Click(sender As Object, e As EventArgs) Handles lnkcmdVerifyEmail.Click
+        ' go to the relevant verify page
+        lblStatus.Text = SendVerificationEmail(lblEmail.Text.Trim)
+    End Sub
+
+
+
+    'Protected Sub lnkGetNewPassword_Click(sender As Object, e As EventArgs) Handles lnkGetNewPassword.Click
+
+    '    ' ----------------------- test ------------------------
+    '    'Dim sError1 As String = SendSMS("07910030684@evotext.net", "Hi Stu")
+    '    ''Dim sError As String = SendSMS("07910030684@evotext.net", "test")
+    '    'Dim sError1 As String = SendSMS2("07507342793@evotext.net", "testrr")
+
+    '    'If sError1.Trim <> "" Then
+    '    '    lblStatus.Text &= "With Broadlook: " & sError1
+    '    'Else
+    '    '    lblStatus.Text &= "With Broadlook: " & "SMS sent with code to login - must be changed on first login" & "<br /><br />"
+    '    'End If
+
+    '    'Dim sError2 As String = SendSMS("07507342793@evotext.net", "Hi Me")
+
+    '    'If sError2.Trim <> "" Then
+    '    '    lblStatus.Text &= "Without Broadlook: " & sError2
+    '    'Else
+    '    '    lblStatus.Text &= "Without Broadlook: " & "SMS sent with code to login - must be changed on first login" & "<br /><br />"
+    '    'End If
+
+    '    'Dim sError As String = SendSMS2("sanjay.patel@evolutionjobs.co.uk", "test")
+    '    ' ----------------------- test ------------------------
+
+
+
+
+    '    Dim dtCons As New System.Data.DataTable
+    '    Using lib1 As New clsMyReports(BIWindowsConnectionString)
+    '        dtCons = lib1.GetNewPasswordForAUser("Evolution2", 517)
+    '    End Using
+
+    '    Dim sCode As String = ""
+    '    If dtCons IsNot Nothing Then
+
+    '        Dim iCount As Integer = 0
+    '        Dim row As DataRow
+    '        For Each row In dtCons.Rows
+
+    '            If Not IsDBNull(row(0)) Then
+    '                sCode = row(0)
+    '                Exit For
+    '            End If
+    '            iCount += 1
+    '        Next
+
+    '        ' IMPORTANT : THE SMS ONLY WORKS ON A SERVER BECAUSE IT HAS TO HAVE RIGHTS TO RELAY TO EXTERNAL DOMAIN
+    '        ' IMPORTANT : THE SMS ONLY WORKS ON A SERVER BECAUSE IT HAS TO HAVE RIGHTS TO RELAY TO EXTERNAL DOMAIN
+    '        ' IMPORTANT : THE SMS ONLY WORKS ON A SERVER BECAUSE IT HAS TO HAVE RIGHTS TO RELAY TO EXTERNAL DOMAIN
+    '        ' IMPORTANT : THE SMS ONLY WORKS ON A SERVER BECAUSE IT HAS TO HAVE RIGHTS TO RELAY TO EXTERNAL DOMAIN
+    '        ' IMPORTANT : THE SMS ONLY WORKS ON A SERVER BECAUSE IT HAS TO HAVE RIGHTS TO RELAY TO EXTERNAL DOMAIN
+    '        Dim sError As String = SendSMS2("07507342793@evotext.net", "test")
+    '        'Dim sError As String = SendSMS("sanjay.patel@evolutionjobs.co.uk", "test")
+    '        'Dim sError As String = SendSMS("07507342793@evotext.net", sCode)
+    '        'SaveTextToFile("", "DEVELOPMENT - s_SendSMS SENT TO DEV TEL")
+
+    '        If sError.Trim <> "" Then
+    '            lblStatus.Text = sError
+    '        Else
+    '            lblStatus.Text = "SMS sent with code to login - must be changed on first login"
+    '        End If
+
+    '    End If
+
+
+    'End Sub
+
+    Protected Sub lnkcmdSendPasswordEmail_Click(sender As Object, e As EventArgs) Handles lnkcmdSendPasswordEmail.Click
+
+    End Sub
+
+
+    Protected Sub lnkcmdSendPasswordMobile_Click(sender As Object, e As EventArgs) Handles lnkcmdSendPasswordMobile.Click
+
+    End Sub
+
+
+
+End Class

@@ -1,0 +1,46 @@
+﻿
+The following are required for 2-hop to work on Chrome and Edge
+
+
+
+
+--------------- edge ---------------
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Policies\Microsoft\Edge]
+"AuthNegotiateDelegateAllowlist"="evoweb*,evosvr*,bi.evolutionjobs.local"
+"AuthServerAllowlist"="evoweb*,evosvr*,bi.evolutionjobs.local"
+--------------- edge ---------------
+
+--------------- chrome 2021 updated---------------
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Policies\Google\Chrome]
+"AuthNegotiateDelegateAllowlist"="evoweb*,evosvr*,bi.evolutionjobs.local"
+"AuthServerAllowlist"="evoweb*,evosvr*,bi.evolutionjobs.local"
+--------------- chrome 2021 updated---------------
+
+
+
+--------------- chrome 2021 updated---------------
+Windows Registry Editor Version 5.00
+
+(using whitelist)
+[HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Policies\Google\Chrome]
+"AuthNegotiateDelegateWhitelist"="evoweb*,evosvr*,bi.evolutionjobs.local"
+"AuthServerWhitelist"="evoweb*,evosvr*,bi.evolutionjobs.local"
+
+
+New version 2022: (using Allowlist) - must be new version > Version 101.0.4951.41 (Official Build) (64-bit)
+[HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Policies\Google\Chrome]
+"AuthNegotiateDelegateAllowlist"="evoweb*,evosvr*,bi.evolutionjobs.local"
+"AuthServerAllowlist"="evoweb*,evosvr*,bi.evolutionjobs.local"
+
+Open CMD > type gpudate/force then update chrome.
+--------------- chrome 2021 updated---------------
+
+
+
+
+
+

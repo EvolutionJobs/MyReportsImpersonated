@@ -1,0 +1,105 @@
+﻿<%@ Page Title="" Language="VB" MasterPageFile="~/Site.master" AutoEventWireup="false" CodeFile="MyAccount.aspx.vb" Inherits="_MyAccount" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" Runat="Server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="MainContent" Runat="Server">
+
+<center><h2><asp:Label ID="lblHeading" runat="server" Text=""></asp:Label></h2></center>
+
+<asp:Panel ID="pnlContactHR" runat="server">
+
+    <p>
+        To protect your data, we require a mobile number or personal email address where we can send a temporary password to.
+    </p>
+    <p>
+        Please contact HR and give them a mobile phone number or personal email address, which they will enter into the system.
+    </p>
+    <p>
+        Then refresh this page to verify the phone number or email address and once verified, we will send an SMS or email with the new password.
+    </p>
+    <p>
+    <asp:LinkButton ID="lnkcmdRefresh" runat="server">Refresh page</asp:LinkButton>
+    </p>
+</asp:Panel>
+
+
+
+<asp:Panel ID="pnlHaveDetails" runat="server">
+    <asp:Label ID="lblDetailsIntro" runat="server" Text=""></asp:Label>
+    <table width="100%" border="1" style=" border-collapse: collapse; border: 1px solid gray">
+
+    <tr><td align="left">Mobile:</td><td align="left">
+        <asp:Label ID="lblMobile" runat="server" Text=""></asp:Label>
+        </td>
+        <td align="left">
+            <asp:LinkButton ID="lnkcmdVerifyMobile" runat="server">Verify</asp:LinkButton>
+            <asp:LinkButton ID="lnkcmdSendPasswordMobile" runat="server">Send Password</asp:LinkButton>
+        </td>
+    </tr>
+    <tr><td align="left">Personal Email:</td><td align="left">
+        <asp:Label ID="lblEmail" runat="server" Text=""></asp:Label>
+        </td>
+        <td align="left">
+            <asp:LinkButton ID="lnkcmdVerifyEmail" runat="server">Verify</asp:LinkButton>
+            <asp:LinkButton ID="lnkcmdSendPasswordEmail" runat="server">Send Password</asp:LinkButton>
+        </td>
+        </tr>
+
+    </table>
+    <asp:Button ID="cmdEditContactDetails" runat="server" Text="Change Details" />
+</asp:Panel>
+
+
+<asp:Panel ID="pnlEditDetails" runat="server">
+
+
+    <table width="100%">
+    <tr><td align="left" colspan="2">
+        <asp:Label ID="lblEditIntro" runat="server"></asp:Label>
+        </td>
+        <td align="left">&nbsp;</td>
+        <td align="left">&nbsp;</td>
+    </tr>
+
+    <tr><td align="left">Mobile:</td><td align="left">
+        <asp:TextBox ID="txtEditPhone" runat="server" Width="277px"></asp:TextBox>
+        <asp:Button ID="cmdUpdatePhone" runat="server" Text="Update" Width="67px" />
+        </td>
+        <td align="left">
+            &nbsp;</td>
+        <td align="left">
+            &nbsp;</td>
+    </tr>
+    <tr><td align="left">Personal Email:</td><td align="left">
+        <asp:TextBox ID="txtEditEmail" runat="server" Width="277px"></asp:TextBox>
+        <asp:Button ID="cmdUpdateEmail" runat="server" Text="Update" Width="67px" />
+        </td>
+        <td align="left">
+            &nbsp;</td>
+        <td align="left">
+            &nbsp;</td>
+        </tr>
+    <tr><td align="left">
+        &nbsp;</td><td align="left">&nbsp;</td>
+        <td align="left">&nbsp;</td>
+        <td align="left">&nbsp;</td>
+        </tr>
+    </table>    
+
+</asp:Panel>
+    <br />
+    <asp:Label ID="lblStatus" runat="server" Text="" ForeColor="Red" Font-Bold="true"></asp:Label>
+
+        <br /><br /><br />
+
+
+
+
+<div style="display:none">
+<asp:Label ID="lblWindowsUsername" runat="server" Text="" ></asp:Label>
+</div>
+
+
+
+</asp:Content>
+

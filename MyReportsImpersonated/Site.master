@@ -1,0 +1,68 @@
+﻿<%@ Master Language="VB" AutoEventWireup="false" CodeFile="Site.Master.vb" Inherits="SiteMaster" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head runat="server">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+    <title></title>
+    <link href="~/Styles/Site.css" rel="stylesheet" type="text/css" />
+	<style>
+	h1   {
+		height: 52px;
+		display: flex;
+		align-items: center;
+		padding: 0 12px;
+		background-color: #3f51b5;
+		color: #fff;
+		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+		font-weight: 300;
+		margin: 0;
+		font-size: 30px;
+		overflow: hidden;
+		box-shadow: rgba(0, 0, 0, 0.14) 0px 0px 4px, rgba(0, 0, 0, 0.28) 0px 4px 8px;
+		z-index: 1;
+	}
+	</style>
+    <script type = "text/javascript" >
+        function preventBack() { window.history.forward(); }
+        setTimeout("preventBack()", 0);
+        window.onunload = function () { null };
+    </script>
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form runat="server" id="WagesLoginForm">
+    <asp:scriptmanager ID="Scriptmanager1" runat="server"></asp:scriptmanager>
+    <div class="page">
+        <div class="header">
+            <div class="title">
+                <h1>
+                    <asp:Literal ID="litMainHeading" runat="server"></asp:Literal>
+                 </h1>
+                  
+             <div class="loginDisplay">
+             Welcome <span class="bold"><asp:LoginName ID="HeadLoginName" runat="server" /></span>!
+            </div>
+              
+            </div>
+            <div class="clear hideSkiplink">
+                <asp:Menu ID="NavigationMenu" runat="server" CssClass="menu" EnableViewState="false" IncludeStyleBlock="false" Orientation="Horizontal">
+                    <Items>
+                        <asp:MenuItem NavigateUrl="~/Default.aspx" Text=""/>
+                    </Items>
+                </asp:Menu>
+            </div>
+        </div>
+        <div class="main">
+            <asp:ContentPlaceHolder ID="MainContent" runat="server"/>
+        </div>
+        <div class="clear">
+        </div>
+    </div>
+    <div class="footer">
+        
+    </div>
+    </form>
+</body>
+</html>
